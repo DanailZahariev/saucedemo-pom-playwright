@@ -23,6 +23,13 @@ export class CartPage {
             .innerText();
     }
 
+    async getProductName(productName: string): Promise<string> {
+        return await this.cartItems
+            .filter({hasText: productName})
+            .locator('[data-test="inventory-item-name"]')
+            .innerText();
+    }
+
     async getCartItemsListCount(): Promise<number> {
         return this.cartItems.count();
     }
