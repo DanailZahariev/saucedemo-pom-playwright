@@ -84,4 +84,19 @@ test.describe("Saucedemo - Cart", async () => {
         await expect(checkoutPage.getFirstnameInput()).toBeEmpty();
 
     });
+
+    test("Display consistent item price between inventory and cart", async ({page}) => {
+        const inventoryPage = pm.onInventoryPage();
+        const cartPage = pm.onCartPage();
+
+        await inventoryPage.addProductToCart(products.productOne.name);
+        const inventoryItemPrice = await inventoryPage.getProductPrice(products.productOne.name);
+
+        await inventoryPage.openCart();
+        const cartItemPrice = await cartPage.getProductPrice(products.productOne.name);
+        await cartPage.clickContinueShopping();
+
+        expect(cartItemPrice).toEqual(inventoryItemPrice);
+
+    });
 });

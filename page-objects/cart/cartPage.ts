@@ -16,6 +16,13 @@ export class CartPage {
         this.continueShoppingBtn = page.locator('[data-test="continue-shopping"]');
     }
 
+    async getProductPrice(productName: string): Promise<string> {
+        return await this.cartItems
+            .filter({hasText: productName})
+            .locator('[data-test="inventory-item-price"]')
+            .innerText();
+    }
+
     async getCartItemsListCount(): Promise<number> {
         return this.cartItems.count();
     }

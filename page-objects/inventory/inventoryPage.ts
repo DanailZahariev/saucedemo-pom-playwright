@@ -80,4 +80,9 @@ export class InventoryPage {
             return Number(withoutSign);
         });
     }
+
+    async getProductPrice(productName: string) {
+        return await this.inventoryItems.filter({hasText: productName})
+            .locator('[data-test="inventory-item-price"]').innerText();
+    }
 }
