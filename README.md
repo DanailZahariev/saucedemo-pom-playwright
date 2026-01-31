@@ -28,9 +28,11 @@ npx playwright install
 - Environment: Node.js
 
 ## Project Structure
-
-```
+```text
 saucedemo-ts-playwright/
+├── .github/
+│   └── workflows/
+│       └── playwright.yml # CI/CD pipeline configuration
 ├── page-objects/          # Page Object Model classes
 │   ├── auth/              # Authentication pages (LoginPage)
 │   ├── cart/              # Cart management pages (CartPage)
@@ -125,4 +127,43 @@ Completing the order successfully.
   User credentials and product details are not hardcoded. They are imported from JSON files (users.json, products.json),
   making updates and maintenance much easier.
 
+## CI/CD Pipeline (GitHub Actions)
 
+This project includes a GitHub Actions workflow to automatically run tests on every push or pull request to the `main` or `master` branches.
+
+The workflow is defined in `.github/workflows/playwright.yml` and performs the following steps:
+1.  Sets up a Linux environment (Ubuntu).
+2.  Installs Node.js and dependencies.
+3.  Installs Playwright browsers.
+4.  Executes the tests.
+5.  Uploads the HTML report as an artifact (retained for 30 days).
+
+### Workflow Configuration:
+```yaml
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
