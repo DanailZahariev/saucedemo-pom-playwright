@@ -2,7 +2,7 @@
 
 ## Installation & Setup
 
-Clone the repository:
+- Clone the repository:
 
 ```
 git clone https://github.com/DanailZahariev/saucedemo-pom-playwright.git
@@ -12,13 +12,13 @@ git clone https://github.com/DanailZahariev/saucedemo-pom-playwright.git
 
 ```
 npm install
-- ```
+ ```
 
 - Install Playwright browsers:
 
 ```
 npx playwright install
-- ```
+ ```
 
 ## Tech Stack
 
@@ -49,43 +49,54 @@ saucedemo-ts-playwright/
 ├── playwright.config.ts   # Playwright configuration
 └── package.json           # Project dependencies
 ```
+
 ## Running Tests
 
 ### Run all tests
+
 - Executes all .spec.ts files in headless mode:
+
 ```
 npx playwright test
 ```
 
 ### Run with UI Mode
+
 Opens the interactive UI mode for debugging and time-travel execution:
+
 ```
 npx playwright test --ui
 ```
 
 ### View HTML Report
+
 Generates and opens a detailed HTML report after test execution:
+
 ```
 npx playwright show-report
 ```
 
 ## Test Coverage
+
 The framework covers core End-to-End user journeys using data from the test-data directory:
 
 ### 1. Authentication (login.spec.ts)
-   Login with a valid user (standard_user).
+
+Login with a valid user (standard_user).
 
 Error validation for invalid credentials or locked-out users.
 
 ### 2. Inventory & Products (inventory.spec.ts)
-   Sorting products (by name or price).
+
+Sorting products (by name or price).
 
 Viewing product details.
 
 Adding products to the cart directly from the inventory list.
 
 ### 3. Cart Management (cart.spec.ts)
-   Adding Items: Verifying the cart badge updates correctly.
+
+Adding Items: Verifying the cart badge updates correctly.
 
 Removing Items: removing items and validating the list count.
 
@@ -94,19 +105,24 @@ Price Consistency: Ensuring the price displayed in the inventory matches the pri
 Navigation: Verifying that "Continue Shopping" preserves the cart state.
 
 ### 4. Checkout Flow (checkout.spec.ts)
-   Filling out shipping information (First Name, Last Name, Zip Code).
+
+Filling out shipping information (First Name, Last Name, Zip Code).
 
 Validating the Summary page before finishing.
 
 Completing the order successfully.
 
 ## Key Highlights
-- Page Manager Pattern: I implemented a PageManager class to handle the instantiation of page objects. This avoids cluttering tests with multiple new Page(...) calls.
+
+- Page Manager Pattern: I implemented a PageManager class to handle the instantiation of page objects. This avoids
+  cluttering tests with multiple new Page(...) calls.
 
 ### TypeScript
+
 - const pm = new PageManager(page);
 - await pm.onLoginPage().login(...);
-- Data-Driven Testing: 
-User credentials and product details are not hardcoded. They are imported from JSON files (users.json, products.json), making updates and maintenance much easier.
+- Data-Driven Testing:
+  User credentials and product details are not hardcoded. They are imported from JSON files (users.json, products.json),
+  making updates and maintenance much easier.
 
 
