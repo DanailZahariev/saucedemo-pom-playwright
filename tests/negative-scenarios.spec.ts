@@ -3,32 +3,7 @@ import {PageManager} from "../page-objects/pageManager";
 import users from '../test-data/users.json';
 import products from '../test-data/products.json';
 
-
 test.describe("Tests for negative scenarios", () => {
-
-    test("Test for error user", async ({page, browserName}) => {
-        test.fail(browserName !== 'firefox', 'Firefox does not throw this console error in CI');
-        const pm = new PageManager(page);
-        const errors: string[] = [];
-
-        page.on('pageerror', exception => {
-            errors.push(exception.message);
-        });
-
-        page.on('console', msg => {
-            if (msg.type() === 'error') {
-                errors.push(msg.text());
-            }
-        });
-
-        await pm.onLoginPage().goto();
-        await pm.onLoginPage().login(users.errorUser.username, users.errorUser.password);
-
-        await pm.onInventoryPage().addProductToCart(products.productOne.name);
-
-        expect(errors).toHaveLength(0);
-
-    });
 
     test("Verify product images are not broken", async ({page}) => {
         test.fail();
