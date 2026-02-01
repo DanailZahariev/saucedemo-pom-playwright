@@ -18,5 +18,21 @@
   "missingPassword": {
     "username": "visual_user",
     "password": ""
+  },
+  "errorUser": {
+    "username": "error_user",
+    "password": "secret_sauce"
+  },
+  "problemUser": {
+    "username": "problem_user",
+    "password": "secret_sauce"
+  },
+  "performanceUser": {
+    "username": "performance_glitch_user",
+    "password": "secret_sauce"
+  },
+  "visualUser": {
+    "username": "visual_user",
+    "password": "secret_sauce"
   }
 }
