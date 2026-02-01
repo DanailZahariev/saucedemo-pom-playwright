@@ -6,8 +6,8 @@ import products from '../test-data/products.json';
 
 test.describe("Tests for negative scenarios", () => {
 
-    test("Test for error user", async ({page}) => {
-        test.fail();
+    test("Test for error user", async ({page, browserName}) => {
+        test.fail(browserName !== 'firefox', 'Firefox does not throw this console error in CI');
         const pm = new PageManager(page);
         const errors: string[] = [];
 
