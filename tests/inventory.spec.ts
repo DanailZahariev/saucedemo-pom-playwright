@@ -2,31 +2,31 @@ import {expect, test} from "@playwright/test";
 import {PageManager} from "../page-objects/pageManager";
 import users from '../test-data/users.json';
 import products from '../test-data/products.json';
+import {InventoryPage} from "../page-objects/inventory/inventoryPage";
+import {SortOption} from "../test-data/enums/enums";
+import {USERS} from "../test-data/testData";
 
 
 test.describe("Saucedemo - Inventory", () => {
     let pm: PageManager;
+    let inventoryPage: InventoryPage;
 
     test.beforeEach(async ({page}) => {
         pm = new PageManager(page);
-        await pm.onLoginPage().goto();
+        await pm.loginPage().goto()
 
-        await pm.onLoginPage().login(users.validUser.username, users.validUser.password);
+        inventoryPage = await pm.loginPage().loginSuccess(USERS.STANDARD.username!, USERS.STANDARD.password!);
 
         await expect(page).toHaveURL(/.*inventory.html/);
     });
 
     test("Render inventory list", async () => {
-        const inventoryPage = pm.onInventoryPage();
-
         await expect(inventoryPage.getInventoryList()).toBeVisible();
 
         expect(await inventoryPage.getItemsCount()).toEqual(6);
     });
 
     test("Add and remove items from listing", async () => {
-        const inventoryPage = pm.onInventoryPage();
-
         await inventoryPage.addProductToCart(products.productOne.name);
         await inventoryPage.addProductToCart(products.productTwo.name);
         await expect(inventoryPage.getCardItemsBadgeCount()).toHaveText('2');
@@ -39,8 +39,7 @@ test.describe("Saucedemo - Inventory", () => {
     });
 
     test("Sort products by name A-Z", async () => {
-        const inventoryPage = pm.onInventoryPage();
-        await inventoryPage.sortProductsByName('az');
+        await inventoryPage.sortProductsByName(SortOption.AZ);
 
         const currentNames = await inventoryPage.getProductNames();
         const sortedNames = [...currentNames].sort((a, b) => a.localeCompare(b));
@@ -49,9 +48,7 @@ test.describe("Saucedemo - Inventory", () => {
     });
 
     test("Sort products by name Z-A", async () => {
-        const inventoryPage = pm.onInventoryPage();
-
-        await inventoryPage.sortProductsByName('za');
+        await inventoryPage.sortProductsByName(SortOption.ZA);
         const currentNames = await inventoryPage.getProductNames();
         const sortedNames = [...currentNames].sort((a, b) => b.localeCompare(a));
 
@@ -59,9 +56,9 @@ test.describe("Saucedemo - Inventory", () => {
     });
 
     test("Sort products by price high-low", async () => {
-        const inventoryPage = pm.onInventoryPage();
+        const inventoryPage = pm.inventoryPage();
 
-        await inventoryPage.sortProductsByPrice("hilo");
+        await inventoryPage.sortProductsByPrice(SortOption.HIGH_LOW);
         const currentPrices = await inventoryPage.getProductPrices();
         const sortedPrices = [...currentPrices].sort((a, b) => b - a);
 
@@ -69,9 +66,7 @@ test.describe("Saucedemo - Inventory", () => {
     });
 
     test("Sort products by price low-high", async () => {
-        const inventoryPage = pm.onInventoryPage();
-
-        await inventoryPage.sortProductsByPrice("lohi");
+        await inventoryPage.sortProductsByPrice(SortOption.LOW_HIGH);
         const currentPrices = await inventoryPage.getProductPrices();
 
         const sortedPrices = [...currentPrices].sort((a, b) => a - b);
@@ -79,12 +74,9 @@ test.describe("Saucedemo - Inventory", () => {
     });
 
     test("Open product from inventory list", async ({page}) => {
-        const inventoryPage = pm.onInventoryPage();
-
-        const productDetails = pm.onProductDetails();
-        await inventoryPage.openProductByName(products.productOne.name);
+        const productDetailsPage = await inventoryPage.openProductByName(products.productOne.name);
 
         await expect(page).toHaveURL(/.*inventory-item.html/);
-        await expect(productDetails.getProductName()).toHaveText(products.productOne.name);
+        await expect(productDetailsPage.getProductName()).toHaveText(products.productOne.name);
     });
 });

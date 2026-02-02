@@ -2,28 +2,32 @@ import {expect, test} from "@playwright/test";
 import {PageManager} from "../page-objects/pageManager";
 import products from '../test-data/products.json';
 import users from '../test-data/users.json';
+import {InventoryPage} from "../page-objects/inventory/inventoryPage";
+import {CartPage} from "../page-objects/cart/cartPage";
+import {CheckoutPage} from "../page-objects/checkout/checkoutPage";
+import {USERS} from "../test-data/testData";
 
 
 test.describe("Checkout - Saucedemo", async () => {
     let pm: PageManager;
+    let inventoryPage: InventoryPage;
+    let cartPage: CartPage;
+    let checkoutPage: CheckoutPage;
+
     const PRODUCT_ONE = products.productOne;
 
     test.beforeEach(async ({page}) => {
         pm = new PageManager(page);
 
-        await pm.onLoginPage().goto();
-        await pm.onLoginPage().login(users.validUser.username, users.validUser.password);
+        await pm.loginPage().goto();
+        inventoryPage = await pm.loginPage().loginSuccess(USERS.STANDARD.username!, USERS.STANDARD.password!);
         await expect(page).toHaveURL(/.*inventory.html/);
     });
 
     test("Complete checkout with valid data", async ({page}) => {
-        const inventoryPage = pm.onInventoryPage();
-        const cartPage = pm.onCartPage();
-        const checkoutPage = pm.onCheckoutPage();
-
         await inventoryPage.addProductToCart(PRODUCT_ONE.name);
-        await inventoryPage.openCart();
-        await cartPage.clickCheckout();
+        cartPage = await inventoryPage.openCart();
+        checkoutPage = await cartPage.clickCheckout();
 
         await expect(page).toHaveURL(/.*checkout-step-one.html/);
         await checkoutPage.fillShippingInfo("Ivan", "Ivanov", "1000");
@@ -44,13 +48,9 @@ test.describe("Checkout - Saucedemo", async () => {
     });
 
     test("Validate: first name is required", async () => {
-        const inventoryPage = pm.onInventoryPage();
-        const cartPage = pm.onCartPage();
-        const checkoutPage = pm.onCheckoutPage();
-
         await inventoryPage.addProductToCart(PRODUCT_ONE.name);
-        await inventoryPage.openCart();
-        await cartPage.clickCheckout();
+        cartPage = await inventoryPage.openCart();
+        checkoutPage = await cartPage.clickCheckout();
 
         await checkoutPage.fillShippingInfo("", "Ivanov", "1000");
         await checkoutPage.clickContinue();
@@ -59,13 +59,9 @@ test.describe("Checkout - Saucedemo", async () => {
     });
 
     test("Validate: last name is required", async () => {
-        const inventoryPage = pm.onInventoryPage();
-        const cartPage = pm.onCartPage();
-        const checkoutPage = pm.onCheckoutPage();
-
         await inventoryPage.addProductToCart(PRODUCT_ONE.name);
-        await inventoryPage.openCart();
-        await cartPage.clickCheckout();
+        cartPage = await inventoryPage.openCart();
+        checkoutPage = await cartPage.clickCheckout();
 
         await checkoutPage.fillShippingInfo("Ivan", "", "1000");
         await checkoutPage.clickContinue();
@@ -75,13 +71,9 @@ test.describe("Checkout - Saucedemo", async () => {
 
 
     test("Validate: zip-code is required", async () => {
-        const inventoryPage = pm.onInventoryPage();
-        const cartPage = pm.onCartPage();
-        const checkoutPage = pm.onCheckoutPage();
-
         await inventoryPage.addProductToCart(PRODUCT_ONE.name);
-        await inventoryPage.openCart();
-        await cartPage.clickCheckout();
+        cartPage = await inventoryPage.openCart();
+        checkoutPage = await cartPage.clickCheckout();
 
         await checkoutPage.fillShippingInfo("Ivan", "Ivanov", "");
         await checkoutPage.clickContinue();
@@ -90,13 +82,9 @@ test.describe("Checkout - Saucedemo", async () => {
     });
 
     test("Cancel on step one returns to cart and keep items", async ({page}) => {
-        const inventoryPage = pm.onInventoryPage();
-        const cartPage = pm.onCartPage();
-        const checkoutPage = pm.onCheckoutPage();
-
         await inventoryPage.addProductToCart(PRODUCT_ONE.name);
-        await inventoryPage.openCart();
-        await cartPage.clickCheckout();
+        cartPage = await inventoryPage.openCart();
+        checkoutPage = await cartPage.clickCheckout();
 
         await expect(page).toHaveURL(/.*checkout-step-one.html/);
         await checkoutPage.clickCancel();

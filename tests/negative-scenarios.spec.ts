@@ -1,61 +1,55 @@
 import {expect, test} from "@playwright/test";
 import {PageManager} from "../page-objects/pageManager";
-import users from '../test-data/users.json';
 import products from '../test-data/products.json';
+import {USERS} from "../test-data/testData";
 
-test.describe("Tests for negative scenarios", () => {
+test.describe("Tests for negative scenarios (Edge Cases)", () => {
+    let pm: PageManager;
 
-    test("Verify product images are not broken", async ({page}) => {
-        test.fail();
-        const pm = new PageManager(page);
-        await pm.onLoginPage().goto();
-        await pm.onLoginPage().login(users.problemUser.username, users.problemUser.password);
-
-        const allSrcs = await page.locator('.inventory_item_img img')
-            .evaluateAll(imgs =>
-                imgs.map(img => (img as HTMLImageElement).src));
-
-        const uniqueSrcs = new Set(allSrcs);
-
-        expect(uniqueSrcs.size).toEqual(allSrcs.length);
-
+    test.beforeEach(async ({page}) => {
+        pm = new PageManager(page);
+        await pm.loginPage().goto();
     });
 
-    test('Login performance check', async ({page}) => {
+    test("Verify product images are not broken (problem_user)", async () => {
         test.fail();
-        const pm = new PageManager(page);
-        const loginPage = pm.onLoginPage();
+
+        const inventoryPage = await pm.loginPage()
+            .loginSuccess(USERS.PROBLEM.username!, USERS.PROBLEM.password!);
+
+        const allSrcs = await inventoryPage.getProductImageSources();
+
+        const uniqueSrcs = new Set(allSrcs);
+        expect(uniqueSrcs.size).toEqual(allSrcs.length);
+    });
+
+    test('Login performance check (performance_glitch_user)', async ({page}) => {
+        test.fail();
 
         const startTime = Date.now();
 
-        await loginPage.goto();
-        await loginPage.login(users.performanceUser.username, users.performanceUser.password);
-
-        await expect(page).toHaveURL(/.*inventory.html/);
+        await pm.loginPage()
+            .loginSuccess(USERS.PERFORMANCE.username!, USERS.PERFORMANCE.password!);
 
         const duration = Date.now() - startTime;
         console.log(`Login took: ${duration}ms`);
 
         expect(duration).toBeLessThan(5000);
-
     });
 
-    test('Verify correct prices for visual_user (Data Integrity Check)', async ({page}) => {
+    test('Verify correct prices (visual_user data integrity)', async () => {
         test.fail();
-        const pm = new PageManager(page);
-        const inventoryPage = pm.onInventoryPage();
-        const expectedPrices = Object.values(products)
-            .map(product => {
-                return Number(product.price.replace("$", ""));
-            }).sort((a, b) => a - b);
 
-        await pm.onLoginPage().goto();
-        await pm.onLoginPage().login(users.visualUser.username, users.visualUser.password);
+        const expectedPrices = Object.values(products)
+            .map(p => Number(p.price.replace("$", "")))
+            .sort((a, b) => a - b);
+
+        const inventoryPage = await pm.loginPage()
+            .loginSuccess(USERS.VISUAL.username!, USERS.VISUAL.password!);
 
         const actualPrices = await inventoryPage.getProductPrices();
         actualPrices.sort((a, b) => a - b);
 
         expect(actualPrices).toEqual(expectedPrices);
-
     });
 });

@@ -1,8 +1,10 @@
 import {Locator, Page} from "@playwright/test";
+import {BasePage} from "../base/BasePage";
+import {CartPage} from "../cart/cartPage";
+import {ProductDetailsPage} from "../product/productDetailsPage";
 
-export class InventoryPage {
+export class InventoryPage extends BasePage {
 
-    private readonly page: Page;
     private readonly inventoryItems: Locator;
     private readonly sortSelector: Locator;
     private readonly cartLink: Locator;
@@ -12,7 +14,7 @@ export class InventoryPage {
     private readonly itemsPrices: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.inventoryItems = page.locator('[data-test="inventory-item"]');
         this.sortSelector = page.locator('[data-test="product-sort-container"]');
         this.cartLink = page.locator('[data-test="shopping-cart-link"]');
@@ -23,36 +25,67 @@ export class InventoryPage {
     }
 
     async addProductToCart(productName: string) {
-        const productBox = this.inventoryItems
-            .filter({hasText: productName});
-        const addToCartBtn = productBox.locator('button',
-            {hasText: 'Add to cart'});
+        const addToCartBtn = this.getProductBox(productName)
+            .locator('button', {hasText: 'Add to cart'});
 
-        await addToCartBtn.click();
+        await this.clickElement(addToCartBtn); // Използваме BasePage wrapper
+        return this;
     }
 
     async removeProductFromCart(productName: string) {
-        const productBox = this.inventoryItems
-            .filter({hasText: productName});
-        const removeFromCartBtn = productBox.locator('button',
-            {hasText: 'Remove'});
-        await removeFromCartBtn.click();
+        const removeBtn = this.getProductBox(productName)
+            .locator('button', {hasText: 'Remove'});
+
+        await this.clickElement(removeBtn);
+        return this;
     }
 
-    async openProductByName(productName: string) {
-        await this.itemsNames.filter({hasText: productName}).click();
+    async openProductByName(productName: string): Promise<ProductDetailsPage> {
+        await this.clickElement(this.itemsNames.filter({hasText: productName}));
+        return new ProductDetailsPage(this.page);
     }
 
-    async sortProductsByName(sortOption: string) {
+    async sortProductsByName(sortOption: string): Promise<this> {
         await this.sortSelector.selectOption(sortOption);
+        return this;
     }
 
-    async sortProductsByPrice(sortOption: string) {
+    async sortProductsByPrice(sortOption: string): Promise<this> {
         await this.sortSelector.selectOption(sortOption);
+        return this;
     }
 
-    async openCart() {
-        await this.cartLink.click();
+    async openCart(): Promise<CartPage> {
+        await this.clickElement(this.cartLink);
+        return new CartPage(this.page);
+    }
+
+    async getProductPrices(): Promise<number[]> {
+        const priceList = await this.getAllTextContents(this.itemsPrices);
+
+        return priceList.map(p => {
+            const withoutSign = p.replace("$", "");
+
+            return Number(withoutSign);
+        });
+    }
+
+    async getProductPrice(productName: string): Promise<string> {
+        const productBox = this.getProductBox(productName)
+            .locator('[data-test="inventory-item-price"]');
+        return await this.getInnerText(productBox);
+    }
+
+    getRemoveButton(productName: string): Locator {
+        return this.inventoryItems
+            .filter({hasText: productName})
+            .getByRole('button', {name: 'Remove'});
+    }
+
+    async getProductImageSources(): Promise<string[]> {
+        return this.inventoryItems.locator('img').evaluateAll((imgs) =>
+            imgs.map((img) => (img as HTMLImageElement).src)
+        );
     }
 
     getInventoryList(): Locator {
@@ -68,21 +101,10 @@ export class InventoryPage {
     }
 
     async getProductNames(): Promise<string[]> {
-        return await this.itemsNames.allTextContents();
+        return this.getAllTextContents(this.itemsNames);
     }
 
-    async getProductPrices(): Promise<number[]> {
-        const priceList = await this.itemsPrices.allTextContents();
-
-        return priceList.map(p => {
-            const withoutSign = p.replace("$", "");
-
-            return Number(withoutSign);
-        });
-    }
-
-    async getProductPrice(productName: string) {
-        return await this.inventoryItems.filter({hasText: productName})
-            .locator('[data-test="inventory-item-price"]').innerText();
+    private getProductBox(productName: string): Locator {
+        return this.inventoryItems.filter({hasText: productName});
     }
 }

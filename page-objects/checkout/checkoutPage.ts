@@ -1,8 +1,8 @@
 import {Locator, Page} from "@playwright/test";
+import {BasePage} from "../base/BasePage";
 
-export class CheckoutPage {
+export class CheckoutPage extends BasePage {
 
-    private readonly page: Page;
     private readonly firstnameInput: Locator;
     private readonly lastnameInput: Locator;
     private readonly zipCode: Locator;
@@ -15,7 +15,7 @@ export class CheckoutPage {
     private readonly completeHeader: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.firstnameInput = page.locator('[data-test="firstName"]');
         this.lastnameInput = page.locator('[data-test="lastName"]');
         this.zipCode = page.locator('[data-test="postalCode"]');
@@ -35,15 +35,16 @@ export class CheckoutPage {
     }
 
     async clickFinish() {
-        await this.finishBtn.click();
+        await this.clickElement(this.finishBtn);
     }
 
     async clickContinue() {
-        await this.continueBtn.click();
+        await this.clickElement(this.continueBtn);
+        return this;
     }
 
     async clickCancel() {
-        await this.cancelBtn.click();
+        await this.clickElement(this.cancelBtn);
     }
 
     getCompleteHeader(): Locator {
@@ -55,13 +56,13 @@ export class CheckoutPage {
     }
 
     async getProductPriceInfo(productName: string) {
-        return await this.productInfo.filter({hasText: productName})
-            .locator('[data-test="inventory-item-price"]').innerText();
+        return this.getInnerText(this.productInfo.filter({hasText: productName})
+            .locator('[data-test="inventory-item-price"]'));
     }
 
     async getProductNameInfo(productName: string) {
-        return await this.productInfo.filter({hasText: productName})
-            .locator('[data-test="inventory-item-name"]').innerText();
+        return this.getInnerText(this.productInfo.filter({hasText: productName})
+            .locator('[data-test="inventory-item-name"]'));
     }
 
     getErrorMessage() {

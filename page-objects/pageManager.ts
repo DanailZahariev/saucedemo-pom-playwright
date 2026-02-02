@@ -8,38 +8,48 @@ import {CheckoutPage} from "./checkout/checkoutPage";
 export class PageManager {
 
     private readonly page: Page;
-    private readonly loginPage: LoginPage;
-    private readonly inventoryPage: InventoryPage;
-    private readonly productDetails: ProductDetailsPage;
-    private readonly cartPage: CartPage;
-    private readonly checkoutPage: CheckoutPage;
+    private _loginPage?: LoginPage;
+    private _inventoryPage?: InventoryPage;
+    private _productDetails?: ProductDetailsPage;
+    private _cartPage?: CartPage;
+    private _checkoutPage?: CheckoutPage;
 
     constructor(page: Page) {
         this.page = page;
-        this.loginPage = new LoginPage(this.page);
-        this.inventoryPage = new InventoryPage(this.page);
-        this.productDetails = new ProductDetailsPage(this.page);
-        this.cartPage = new CartPage(this.page);
-        this.checkoutPage = new CheckoutPage(this.page);
     }
 
-    onLoginPage(): LoginPage {
-        return this.loginPage;
+    loginPage(): LoginPage {
+        if (!this._loginPage) {
+            this._loginPage = new LoginPage(this.page);
+        }
+        return this._loginPage;
     }
 
-    onInventoryPage(): InventoryPage {
-        return this.inventoryPage;
+    inventoryPage(): InventoryPage {
+        if (!this._inventoryPage) {
+            this._inventoryPage = new InventoryPage(this.page);
+        }
+        return this._inventoryPage;
     }
 
-    onProductDetails(): ProductDetailsPage {
-        return this.productDetails;
+    productDetails(): ProductDetailsPage {
+        if (!this._productDetails) {
+            this._productDetails = new ProductDetailsPage(this.page);
+        }
+        return this._productDetails;
     }
 
-    onCartPage(): CartPage {
-        return this.cartPage;
+    cartPage(): CartPage {
+        if (!this._cartPage) {
+            this._cartPage = new CartPage(this.page);
+        }
+        return this._cartPage;
     }
 
-    onCheckoutPage(): CheckoutPage {
-        return this.checkoutPage;
+    checkoutPage(): CheckoutPage {
+        if (!this._checkoutPage) {
+            this._checkoutPage = new CheckoutPage(this.page);
+        }
+        return this._checkoutPage;
     }
 }

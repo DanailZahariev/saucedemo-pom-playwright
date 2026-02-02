@@ -1,59 +1,59 @@
 import {test, expect} from "@playwright/test";
 import {PageManager} from "../page-objects/pageManager";
 import users from '../test-data/users.json';
+import {USERS} from "../test-data/testData";
 
 test.describe("Saucedemo - Login", () => {
     let pm: PageManager;
 
     test.beforeEach(async ({page}) => {
         pm = new PageManager(page);
-        await pm.onLoginPage().goto();
+        await pm.loginPage().goto();
     });
 
     test("Successfully logged in", async ({page}) => {
-        const loginPage = pm.onLoginPage();
-
-        await loginPage.login(users.validUser.username, users.validUser.password);
+        await pm.loginPage()
+            .loginSuccess(USERS.STANDARD.username!, USERS.STANDARD.password!);
 
         await expect(page).toHaveURL(/.*inventory.html/);
         await expect(page.locator(".inventory_list")).toBeVisible();
     });
 
     test("Fail to logged in with wrong password", async ({page}) => {
-        const loginPage = pm.onLoginPage();
+        const errorText = await pm.loginPage()
+            .loginFailure(USERS.INVALID_PASS.username!, USERS.INVALID_PASS.password!)
+            .then(err => err.getErrorMessage());
 
-        await loginPage.login(users.wrongPassword.username, users.wrongPassword.password);
 
-        await expect(loginPage.getErrorLocator()).toContainText("Username and password do not match");
-        await expect(loginPage.getErrorLocator()).toBeVisible();
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Username and password do not match");
     });
 
     test("Failed to login with locked-out user", async ({page}) => {
-        const loginPage = pm.onLoginPage();
+        const errorText = await pm.loginPage()
+            .loginFailure(USERS.LOCKED_OUT.username!, USERS.LOCKED_OUT.password!)
+            .then(err => err.getErrorMessage());
 
-        await loginPage.login(users.lockedOutUser.username, users.lockedOutUser.password);
-
-        await expect(loginPage.getErrorLocator()).toBeVisible();
-        await expect(loginPage.getErrorLocator()).toContainText(
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText(
             'Sorry, this user has been locked out'
         );
     });
 
     test("Validation: username is required", async ({page}) => {
-        const loginPage = pm.onLoginPage();
+        const errorText = await pm.loginPage()
+            .loginFailure(USERS.INVALID_USERNAME.username!, USERS.INVALID_USERNAME.password!)
+            .then(err => err.getErrorMessage());
 
-        await loginPage.login(users.missingUsername.username, users.missingPassword.password);
-
-        await expect(loginPage.getErrorLocator()).toBeVisible();
-        await expect(loginPage.getErrorLocator()).toContainText("Username is required");
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Username is required");
     });
 
     test("Validation: password is required", async ({page}) => {
-        const loginPage = pm.onLoginPage();
+        const errorText = await pm.loginPage().loginFailure(USERS.MISSING_PASSWORD.username!, USERS.MISSING_PASSWORD.password!)
+            .then(err => err.getErrorMessage());
 
-        await loginPage.login(users.missingPassword.username, users.missingPassword.password);
-
-        await expect(loginPage.getErrorLocator()).toBeVisible();
-        await expect(loginPage.getErrorLocator()).toContainText("Password is required");
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Password is required");
     });
 });
