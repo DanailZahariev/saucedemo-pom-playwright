@@ -27,29 +27,32 @@ npx playwright install
 - Design Pattern: Page Object Model (POM)
 - Environment: Node.js
 
-## Project Structure
+## 📂 Project Structure
+
+The project follows the **Page Object Model (POM)** design pattern with a dedicated **Data Layer** for type safety.
+
 ```text
-saucedemo-ts-playwright/
-├── .github/
-│   └── workflows/
-│       └── playwright.yml # CI/CD pipeline configuration
-├── page-objects/          # Page Object Model classes
-│   ├── auth/              # Authentication pages (LoginPage)
-│   ├── cart/              # Cart management pages (CartPage)
-│   ├── checkout/          # Checkout process pages (CheckoutPage)
-│   ├── inventory/         # Product catalog pages (InventoryPage)
-│   ├── product/           # Individual product details (ProductDetailsPage)
-│   └── pageManager.ts     # Centralized manager for initializing page objects
-├── test-data/             # JSON files for data-driven testing
-│   ├── products.json      # Product data (names, prices)
-│   └── users.json         # User credentials (valid/invalid accounts)
-├── tests/                 # Test specifications (.spec.ts files)
-│   ├── cart.spec.ts       # Cart functionality tests
-│   ├── checkout.spec.ts   # Checkout flow tests
-│   ├── inventory.spec.ts  # Inventory/Catalog tests
-│   └── login.spec.ts      # Authentication tests
-├── playwright.config.ts   # Playwright configuration
-└── package.json           # Project dependencies
+.
+├── page-objects/                 # Page Object Model (POM) Implementation
+│   ├── auth/                     # Login & Authentication pages
+│   ├── base/                     # BasePage with common wrapper methods (SOLID)
+│   ├── cart/                     # Cart functionality and logic
+│   ├── checkout/                 # Checkout process steps
+│   ├── inventory/                # Inventory list and product filtering
+│   ├── product/                  # Product details page logic
+│   └── pageManager.ts            # ⚡ Manager for Lazy Loading of page objects
+│
+├── test-data/                    # Data Layer (Type-Safe)
+│   ├── enums/                    # TypeScript Enums (e.g., SortOption)
+│   ├── models/                   # Interfaces for Users and Products
+│   ├── products.json             # Raw product data (JSON)
+│   ├── users.json                # Raw user data (JSON)
+│   └── testData.ts               # Centralized, typed data export
+│
+├── tests/                        # Test Specifications (*.spec.ts)
+├── playwright-report/            # Test execution reports (HTML)
+├── playwright.config.ts          # Playwright Configuration
+└── package.json                  # Dependencies and Scripts
 ```
 
 ## Running Tests
