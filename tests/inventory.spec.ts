@@ -1,80 +1,64 @@
-import {expect, test} from "@playwright/test";
-import {PageManager} from "../page-objects/pageManager";
-import users from '../test-data/users.json';
+import {test, expect} from "./fixtures";
 import products from '../test-data/products.json';
-import {InventoryPage} from "../page-objects/inventory/inventoryPage";
 import {SortOption} from "../test-data/enums/enums";
-import {USERS} from "../test-data/testData";
 
 
 test.describe("Saucedemo - Inventory", () => {
-    let pm: PageManager;
-    let inventoryPage: InventoryPage;
 
-    test.beforeEach(async ({page}) => {
-        pm = new PageManager(page);
-        await pm.loginPage().goto()
+    test("Render inventory list", async ({authedInventoryPage}) => {
+        await expect(authedInventoryPage.getInventoryList()).toBeVisible();
 
-        inventoryPage = await pm.loginPage().loginSuccess(USERS.STANDARD.username!, USERS.STANDARD.password!);
-
-        await expect(page).toHaveURL(/.*inventory.html/);
+        expect(await authedInventoryPage.getItemsCount()).toEqual(6);
     });
 
-    test("Render inventory list", async () => {
-        await expect(inventoryPage.getInventoryList()).toBeVisible();
+    test("Add and remove items from listing", async ({authedInventoryPage}) => {
+        await authedInventoryPage.addProductToCart(products.productOne.name);
+        await authedInventoryPage.addProductToCart(products.productTwo.name);
+        await expect(authedInventoryPage.getCardItemsBadgeCount()).toHaveText('2');
 
-        expect(await inventoryPage.getItemsCount()).toEqual(6);
+        await authedInventoryPage.removeProductFromCart(products.productOne.name);
+        await expect(authedInventoryPage.getCardItemsBadgeCount()).toHaveText('1');
+
+        await authedInventoryPage.removeProductFromCart(products.productTwo.name);
+        await expect(authedInventoryPage.getCardItemsBadgeCount()).not.toBeVisible();
     });
 
-    test("Add and remove items from listing", async () => {
-        await inventoryPage.addProductToCart(products.productOne.name);
-        await inventoryPage.addProductToCart(products.productTwo.name);
-        await expect(inventoryPage.getCardItemsBadgeCount()).toHaveText('2');
+    test("Sort products by name A-Z", async ({authedInventoryPage}) => {
+        await authedInventoryPage.sortProductsByName(SortOption.AZ);
 
-        await inventoryPage.removeProductFromCart(products.productOne.name);
-        await expect(inventoryPage.getCardItemsBadgeCount()).toHaveText('1');
-
-        await inventoryPage.removeProductFromCart(products.productTwo.name);
-        await expect(inventoryPage.getCardItemsBadgeCount()).not.toBeVisible();
-    });
-
-    test("Sort products by name A-Z", async () => {
-        await inventoryPage.sortProductsByName(SortOption.AZ);
-
-        const currentNames = await inventoryPage.getProductNames();
+        const currentNames = await authedInventoryPage.getProductNames();
         const sortedNames = [...currentNames].sort((a, b) => a.localeCompare(b));
 
         expect(currentNames).toEqual(sortedNames);
     });
 
-    test("Sort products by name Z-A", async () => {
-        await inventoryPage.sortProductsByName(SortOption.ZA);
-        const currentNames = await inventoryPage.getProductNames();
+    test("Sort products by name Z-A", async ({authedInventoryPage}) => {
+        await authedInventoryPage.sortProductsByName(SortOption.ZA);
+        const currentNames = await authedInventoryPage.getProductNames();
         const sortedNames = [...currentNames].sort((a, b) => b.localeCompare(a));
 
         expect(currentNames).toEqual(sortedNames);
     });
 
-    test("Sort products by price high-low", async () => {
-        const inventoryPage = pm.inventoryPage();
+    test("Sort products by price high-low", async ({authedInventoryPage}) => {
 
-        await inventoryPage.sortProductsByPrice(SortOption.HIGH_LOW);
-        const currentPrices = await inventoryPage.getProductPrices();
+        await authedInventoryPage.sortProductsByPrice(SortOption.HIGH_LOW);
+        const currentPrices = await authedInventoryPage.getProductPrices();
         const sortedPrices = [...currentPrices].sort((a, b) => b - a);
 
         expect(currentPrices).toEqual(sortedPrices);
     });
 
-    test("Sort products by price low-high", async () => {
-        await inventoryPage.sortProductsByPrice(SortOption.LOW_HIGH);
-        const currentPrices = await inventoryPage.getProductPrices();
+    test("Sort products by price low-high", async ({authedInventoryPage}) => {
+        await authedInventoryPage.sortProductsByPrice(SortOption.LOW_HIGH);
+        const currentPrices = await authedInventoryPage.getProductPrices();
 
         const sortedPrices = [...currentPrices].sort((a, b) => a - b);
         expect(currentPrices).toEqual(sortedPrices);
     });
 
-    test("Open product from inventory list", async ({page}) => {
-        const productDetailsPage = await inventoryPage.openProductByName(products.productOne.name);
+    test("Open product from inventory list", async ({page, authedInventoryPage}) => {
+        const productDetailsPage = await authedInventoryPage.openProductByName(products.productOne.name);
 
         await expect(page).toHaveURL(/.*inventory-item.html/);
         await expect(productDetailsPage.getProductName()).toHaveText(products.productOne.name);

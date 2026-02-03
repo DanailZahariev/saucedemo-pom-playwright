@@ -1,17 +1,14 @@
-import {expect, test} from "@playwright/test";
-import {PageManager} from "../page-objects/pageManager";
+import {test, expect} from "./fixtures";
 import products from '../test-data/products.json';
 import {USERS} from "../test-data/testData";
 
-test.describe("Tests for negative scenarios (Edge Cases)", () => {
-    let pm: PageManager;
 
-    test.beforeEach(async ({page}) => {
-        pm = new PageManager(page);
+test.describe("Tests for negative scenarios (Edge Cases)", () => {
+    test.beforeEach(async ({pm}) => {
         await pm.loginPage().goto();
     });
 
-    test("Verify product images are not broken (problem_user)", async () => {
+    test("Verify product images are not broken (problem_user)", async ({pm}) => {
         test.fail();
 
         const inventoryPage = await pm.loginPage()
@@ -23,10 +20,10 @@ test.describe("Tests for negative scenarios (Edge Cases)", () => {
         expect(uniqueSrcs.size).toEqual(allSrcs.length);
     });
 
-    test('Login performance check (performance_glitch_user)', async ({page}) => {
+    test('Login performance check (performance_glitch_user)', async ({pm}) => {
         test.fail();
 
-        const startTime = Date.now();
+        const startTime = performance.now();
 
         await pm.loginPage()
             .loginSuccess(USERS.PERFORMANCE.username!, USERS.PERFORMANCE.password!);
@@ -37,7 +34,7 @@ test.describe("Tests for negative scenarios (Edge Cases)", () => {
         expect(duration).toBeLessThan(5000);
     });
 
-    test('Verify correct prices (visual_user data integrity)', async () => {
+    test('Verify correct prices (visual_user data integrity)', async ({pm}) => {
         test.fail();
 
         const expectedPrices = Object.values(products)

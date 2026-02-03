@@ -1,6 +1,5 @@
 import {test, expect} from "@playwright/test";
 import {PageManager} from "../page-objects/pageManager";
-import users from '../test-data/users.json';
 import {USERS} from "../test-data/testData";
 
 test.describe("Saucedemo - Login", () => {
