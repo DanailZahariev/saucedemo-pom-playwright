@@ -4,14 +4,52 @@ import {USERS} from "../test-data/testData";
 
 
 test.describe("Tests for negative scenarios (Edge Cases)", () => {
-    test.beforeEach(async ({pm}) => {
-        await pm.loginPage().goto();
+    test.beforeEach(async ({loginPage}) => {
+        await loginPage.goto();
     });
 
-    test("Verify product images are not broken (problem_user)", async ({pm}) => {
+    test("Fail to logged in with wrong password", async ({loginPage}) => {
+        await loginPage.loginFailure(USERS.INVALID_PASS.username!, USERS.INVALID_PASS.password!);
+        const errorText = loginPage.getErrorMessage();
+
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Username and password do not match");
+    });
+
+    test("Failed to login with locked-out user", async ({loginPage}) => {
+        await loginPage.loginFailure(USERS.LOCKED_OUT.username!, USERS.LOCKED_OUT.password!);
+
+        const errorText = loginPage.getErrorMessage();
+
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText(
+            'Sorry, this user has been locked out'
+        );
+    });
+
+    test("Validation: username is required", async ({loginPage}) => {
+        await loginPage
+            .loginFailure(USERS.INVALID_USERNAME.username!, USERS.INVALID_USERNAME.password!);
+
+        const errorText = loginPage.getErrorMessage();
+
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Username is required");
+    });
+
+    test("Validation: password is required", async ({loginPage}) => {
+        await loginPage.loginFailure(USERS.MISSING_PASSWORD.username!, USERS.MISSING_PASSWORD.password!)
+
+        const errorText = loginPage.getErrorMessage();
+
+        await expect(errorText).toBeVisible();
+        await expect(errorText).toContainText("Password is required");
+    });
+
+    test("Verify product images are not broken (problem_user)", async ({loginPage}) => {
         test.fail();
 
-        const inventoryPage = await pm.loginPage()
+        const inventoryPage = await loginPage
             .loginSuccess(USERS.PROBLEM.username!, USERS.PROBLEM.password!);
 
         const allSrcs = await inventoryPage.getProductImageSources();
@@ -20,12 +58,12 @@ test.describe("Tests for negative scenarios (Edge Cases)", () => {
         expect(uniqueSrcs.size).toEqual(allSrcs.length);
     });
 
-    test('Login performance check (performance_glitch_user)', async ({pm}) => {
+    test('Login performance check (performance_glitch_user)', async ({loginPage}) => {
         test.fail();
 
         const startTime = performance.now();
 
-        await pm.loginPage()
+        await loginPage
             .loginSuccess(USERS.PERFORMANCE.username!, USERS.PERFORMANCE.password!);
 
         const duration = Date.now() - startTime;
@@ -34,14 +72,14 @@ test.describe("Tests for negative scenarios (Edge Cases)", () => {
         expect(duration).toBeLessThan(5000);
     });
 
-    test('Verify correct prices (visual_user data integrity)', async ({pm}) => {
+    test('Verify correct prices (visual_user data integrity)', async ({loginPage}) => {
         test.fail();
 
         const expectedPrices = Object.values(products)
             .map(p => Number(p.price.replace("$", "")))
             .sort((a, b) => a - b);
 
-        const inventoryPage = await pm.loginPage()
+        const inventoryPage = await loginPage
             .loginSuccess(USERS.VISUAL.username!, USERS.VISUAL.password!);
 
         const actualPrices = await inventoryPage.getProductPrices();
