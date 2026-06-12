@@ -2,6 +2,7 @@ import {test, expect} from "../fixtures/fixtures";
 import {USERS} from "../test-data/testData";
 
 test.describe("Saucedemo - Login", () => {
+    test.use({storageState: {cookies: [], origins: []}});
 
     test.beforeEach(async ({loginPage}) => {
         await loginPage.goto();

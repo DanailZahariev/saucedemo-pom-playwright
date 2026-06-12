@@ -34,26 +34,40 @@ export default defineConfig({
     use: {
         screenshot: "only-on-failure",
         testIdAttribute: "data-test",
+        baseURL: 'https://www.saucedemo.com',
         /* Base URL to use in actions like `await page.goto('')`. */
         // baseURL: 'http://localhost:3000',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
         trace: 'on-first-retry',
-        // launchOptions: {
-        //   slowMo: 300
-        // }
+        launchOptions: {
+            headless: false,
+            slowMo: 300
+        }
     },
 
     /* Configure projects for major browsers */
     projects: [
         {
+            name: 'setup',
+            testMatch: /.*\.setup\.ts/
+        },
+        {
             name: 'chromium',
-            use: {...devices['Desktop Chrome']},
+            use: {
+                ...devices['Desktop Chrome'],
+                storageState: 'playwright/.auth/user.json',
+            },
+            dependencies: ['setup']
         },
 
         {
             name: 'firefox',
-            use: {...devices['Desktop Firefox']},
+            use: {
+                ...devices['Desktop Firefox'],
+                storageState: 'playwright/.auth/user.json',
+            },
+            dependencies: ['setup']
         },
         //
         // {
