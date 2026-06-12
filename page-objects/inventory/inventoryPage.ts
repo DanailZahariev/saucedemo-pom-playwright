@@ -15,20 +15,20 @@ export class InventoryPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        this.inventoryItems = page.locator('[data-test="inventory-item"]');
-        this.sortSelector = page.locator('[data-test="product-sort-container"]');
-        this.cartLink = page.locator('[data-test="shopping-cart-link"]');
-        this.inventoryList = page.locator('[data-test="inventory-list"]');
-        this.cardBadge = page.locator('[data-test="shopping-cart-badge"]');
-        this.itemsNames = page.locator('[data-test="inventory-item-name"]');
-        this.itemsPrices = page.locator('[data-test="inventory-item-price"]');
+        this.inventoryItems = page.getByTestId("inventory-item");
+        this.sortSelector = page.getByTestId("product-sort-container");
+        this.cartLink = page.getByTestId("shopping-cart-link");
+        this.inventoryList = page.getByTestId("inventory-list")
+        this.cardBadge = page.getByTestId("shopping-cart-badge");
+        this.itemsNames = page.getByTestId("inventory-item-name");
+        this.itemsPrices = page.getByTestId("inventory-item-name");
     }
 
     async addProductToCart(productName: string) {
         const addToCartBtn = this.getProductBox(productName)
             .locator('button', {hasText: 'Add to cart'});
 
-        await this.clickElement(addToCartBtn); // Използваме BasePage wrapper
+        await this.clickElement(addToCartBtn);
         return this;
     }
 
@@ -72,7 +72,7 @@ export class InventoryPage extends BasePage {
 
     async getProductPrice(productName: string): Promise<string> {
         const productBox = this.getProductBox(productName)
-            .locator('[data-test="inventory-item-price"]');
+            .getByTestId("inventory-item-price");
         return await this.getInnerText(productBox);
     }
 

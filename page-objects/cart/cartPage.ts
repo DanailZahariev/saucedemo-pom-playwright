@@ -12,20 +12,20 @@ export class CartPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        this.cartItems = page.locator('[data-test="inventory-item"]');
-        this.checkoutBtn = page.locator('[data-test="checkout"]');
-        this.cartItemNames = page.locator('[data-test="inventory-item-name"]');
-        this.continueShoppingBtn = page.locator('[data-test="continue-shopping"]');
+        this.cartItems = page.getByTestId("inventory-item");
+        this.checkoutBtn = page.getByRole("button", {name: "Checkout"});
+        this.cartItemNames = page.getByTestId("inventory-item-name");
+        this.continueShoppingBtn = page.getByRole("button", {name: "Continue Shopping"});
     }
 
     async getProductPrice(productName: string): Promise<string> {
         const itemContainer = this.getCartItemByName(productName);
-        return this.getInnerText(itemContainer.locator('[data-test="inventory-item-price"]'));
+        return this.getInnerText(itemContainer.getByTestId("inventory-item-price"));
     }
 
     async getProductName(productName: string): Promise<string> {
         const itemContainer = this.getCartItemByName(productName);
-        return this.getInnerText(itemContainer.locator('[data-test="inventory-item-name"]'));
+        return this.getInnerText(itemContainer.getByTestId("inventory-item-name"));
         // return this.getInnerText(this.cartItems
         //     .filter({hasText: productName})
         //     .locator('[data-test="inventory-item-name"]'));
@@ -37,7 +37,7 @@ export class CartPage extends BasePage {
 
     async removeItemByName(productName: string): Promise<this> {
         const itemContainer = this.getCartItemByName(productName);
-        const removeButton = itemContainer.locator('button');
+        const removeButton = itemContainer.getByRole("button", {name: "Remove"});
         await this.clickElement(removeButton);
         return this;
     }

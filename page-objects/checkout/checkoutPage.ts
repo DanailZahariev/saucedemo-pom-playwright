@@ -16,16 +16,17 @@ export class CheckoutPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        this.firstnameInput = page.locator('[data-test="firstName"]');
-        this.lastnameInput = page.locator('[data-test="lastName"]');
-        this.zipCode = page.locator('[data-test="postalCode"]');
-        this.errorLocator = page.locator('[data-test="error"]');
-        this.continueBtn = page.locator('[data-test="continue"]');
-        this.cancelBtn = page.locator('[data-test="cancel"]');
+        this.firstnameInput = page.getByPlaceholder('First Name');
+        this.lastnameInput = page.getByPlaceholder("Last Name");
+        this.zipCode = page.getByPlaceholder("Zip/Postal Code");
+        this.errorLocator = page.getByTestId("error");
+        this.continueBtn = page.getByRole("button", {name: "Continue"});
+        this.cancelBtn = page.getByRole("button", {name: "Cancel"});
         this.summaryInfo = page.locator('.summary_info');
-        this.finishBtn = page.locator('[data-test="finish"]');
-        this.completeHeader = page.locator('[data-test="complete-header"]');
-        this.productInfo = page.locator('[data-test="inventory-item"]');
+        this.finishBtn = page.getByRole("button", {name: "Finish"});
+        // this.completeHeader = page.locator('[data-test="complete-header"]');
+        this.completeHeader = page.getByText("Thank you for your order!");
+        this.productInfo = page.getByTestId("inventory-item");
     }
 
     async fillShippingInfo(firstName: string, lastName: string, zipCode: string): Promise<void> {
@@ -57,12 +58,12 @@ export class CheckoutPage extends BasePage {
 
     async getProductPriceInfo(productName: string) {
         return this.getInnerText(this.productInfo.filter({hasText: productName})
-            .locator('[data-test="inventory-item-price"]'));
+            .getByTestId("inventory-item-price"));
     }
 
     async getProductNameInfo(productName: string) {
         return this.getInnerText(this.productInfo.filter({hasText: productName})
-            .locator('[data-test="inventory-item-name"]'));
+            .getByTestId("inventory-item-name"));
     }
 
     getErrorMessage() {
