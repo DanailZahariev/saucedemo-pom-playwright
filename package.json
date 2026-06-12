@@ -17,6 +17,8 @@
     "@playwright/test": "^1.58.0",
     "@types/node": "^25.1.0",
     "allure-commandline": "^2.42.1",
-    "allure-playwright": "^3.4.5"
+    "allure-playwright": "^3.4.5",
+    "newman": "^6.2.2",
+    "newman-reporter-htmlextra": "^1.23.1"
   }
 }
