@@ -1,4 +1,4 @@
-import {test, expect} from "./fixtures";
+import {test, expect} from "../fixtures/fixtures";
 import products from '../test-data/products.json';
 import {USERS} from "../test-data/testData";
 

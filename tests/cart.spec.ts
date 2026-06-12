@@ -1,4 +1,4 @@
-import {expect, test} from "./fixtures";
+import {expect, test} from "../fixtures/fixtures";
 import products from '../test-data/products.json';
 
 test.describe("Saucedemo - Cart", async () => {
