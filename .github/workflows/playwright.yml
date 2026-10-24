@@ -55,14 +55,13 @@ jobs:
           retention-days: 30
 
       - name: Commit and keep alive
-        if: ${{ !cancelled() && github.event_name == 'schedule' }}
+        if: ${{ !cancelled() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           
-          echo "Last run: $(date)" > keep_alive.txt
+          echo "Last run: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > keep_alive.txt
+          cat keep_alive.txt
           
           git add keep_alive.txt
-          
-          git commit -m "chore: keep-alive [skip ci]" || exit 0
-          git push
+          git diff --staged --quiet || (git commit -m "chore: keep-alive [skip ci]" && git pull --rebase && git push)
