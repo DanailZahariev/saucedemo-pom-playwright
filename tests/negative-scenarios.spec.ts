@@ -2,7 +2,7 @@ import {test, expect} from "../fixtures/fixtures";
 import products from '../test-data/products.json';
 import {USERS} from "../test-data/testData";
 
-
+test.use({ storageState: { cookies: [], origins: [] } });
 test.describe("Tests for negative scenarios (Edge Cases)", () => {
     test.beforeEach(async ({loginPage}) => {
         await loginPage.goto();
@@ -63,13 +63,15 @@ test.describe("Tests for negative scenarios (Edge Cases)", () => {
 
         const startTime = performance.now();
 
-        await loginPage
+        const inventoryPage = await loginPage
             .loginSuccess(USERS.PERFORMANCE.username!, USERS.PERFORMANCE.password!);
 
-        const duration = Date.now() - startTime;
+        await expect(inventoryPage.getInventoryList()).toBeVisible();
+
+        const duration = performance.now() - startTime;
         console.log(`Login took: ${duration}ms`);
 
-        expect(duration).toBeLessThan(5000);
+        expect(duration).toBeLessThan(2000);
     });
 
     test('Verify correct prices (visual_user data integrity)', async ({loginPage}) => {

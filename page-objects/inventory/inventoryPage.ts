@@ -21,7 +21,7 @@ export class InventoryPage extends BasePage {
         this.inventoryList = page.getByTestId("inventory-list")
         this.cardBadge = page.getByTestId("shopping-cart-badge");
         this.itemsNames = page.getByTestId("inventory-item-name");
-        this.itemsPrices = page.getByTestId("inventory-item-name");
+        this.itemsPrices = page.getByTestId("inventory-item-price");
     }
 
     async addProductToCart(productName: string) {
@@ -61,13 +61,11 @@ export class InventoryPage extends BasePage {
     }
 
     async getProductPrices(): Promise<number[]> {
+        await this.itemsPrices.first().waitFor({state: 'visible'});
+
         const priceList = await this.getAllTextContents(this.itemsPrices);
 
-        return priceList.map(p => {
-            const withoutSign = p.replace("$", "");
-
-            return Number(withoutSign);
-        });
+        return priceList.map(p => Number(p.replace("$", "")));
     }
 
     async getProductPrice(productName: string): Promise<string> {
@@ -83,9 +81,12 @@ export class InventoryPage extends BasePage {
     }
 
     async getProductImageSources(): Promise<string[]> {
-        return this.inventoryItems.locator('img').evaluateAll((imgs) =>
-            imgs.map((img) => (img as HTMLImageElement).src)
-        );
+        const images = this.inventoryItems.locator('img');
+
+        await images.first().waitFor({state: 'visible'});
+
+        return images.evaluateAll((imgs) =>
+            imgs.map((img) => (img as HTMLImageElement).src));
     }
 
     getInventoryList(): Locator {

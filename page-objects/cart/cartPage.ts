@@ -12,9 +12,9 @@ export class CartPage extends BasePage {
 
     constructor(page: Page) {
         super(page);
-        this.cartItems = page.getByTestId("inventory-item");
+        this.cartItems = page.locator('#cart_contents_container').getByTestId("inventory-item");
         this.checkoutBtn = page.getByRole("button", {name: "Checkout"});
-        this.cartItemNames = page.getByTestId("inventory-item-name");
+        this.cartItemNames = page.locator('#cart_contents_container').getByTestId("inventory-item-name");
         this.continueShoppingBtn = page.getByRole("button", {name: "Continue Shopping"});
     }
 
@@ -31,8 +31,8 @@ export class CartPage extends BasePage {
         //     .locator('[data-test="inventory-item-name"]'));
     }
 
-    async getCartItemsListCount(): Promise<number> {
-        return this.cartItems.count();
+    getCartItemsListCount(): Locator {
+        return this.cartItems;
     }
 
     async removeItemByName(productName: string): Promise<this> {

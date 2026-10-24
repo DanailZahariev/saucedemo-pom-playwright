@@ -1,6 +1,6 @@
 import {Locator, Page} from "@playwright/test";
 import {BasePage} from "../base/BasePage";
-import InventoryPage from "../inventory/inventoryPage";
+import {InventoryPage} from "../inventory/inventoryPage";
 
 export class ProductDetailsPage extends BasePage {
 
@@ -14,7 +14,7 @@ export class ProductDetailsPage extends BasePage {
         this.addToCartBtn = page.locator('[data-test="add-to-cart"]');
         this.removeFromCartBtn = page.locator('[data-test="remove"]');
         this.backToProductsItem = page.locator('[data-test="back-to-products"]');
-        this.itemTitle = page.locator('[data-test="inventory-item-name"]');
+        this.itemTitle = page.locator('#inventory_item_container').getByTestId('inventory-item-name');
     }
 
     async addToCart() {

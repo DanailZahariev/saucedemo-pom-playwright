@@ -11,9 +11,7 @@ test.describe("Saucedemo - Cart", async () => {
 
         await expect(page).toHaveURL(/.*cart.html/);
 
-        const totalCount = await cartPage.getCartItemsListCount();
-
-        expect(totalCount).toEqual(2);
+        await expect(cartPage.getCartItemsListCount()).toHaveCount(2);
     });
 
     test("Remove and item and updates the card badge", async ({authedInventoryPage}) => {
@@ -26,10 +24,10 @@ test.describe("Saucedemo - Cart", async () => {
 
         await cartPage.removeItemByName(products.productOne.name);
 
-        const totalCount = await cartPage.getCartItemsListCount();
+        const totalCount = cartPage.getCartItemsListCount();
         const currentItems = await cartPage.getCartProductNames();
 
-        expect(totalCount).toEqual(2);
+        await expect(totalCount).toHaveCount(2);
         await expect(authedInventoryPage.getCardItemsBadgeCount()).toHaveText('2');
         expect(currentItems).toEqual([products.productTwo.name, products.productThree.name]);
     });

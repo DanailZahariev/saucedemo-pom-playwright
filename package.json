@@ -14,11 +14,11 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.58.0",
-    "@types/node": "^25.1.0",
-    "allure-commandline": "^2.42.1",
-    "allure-playwright": "^3.4.5",
-    "newman": "^6.2.2",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "allure-commandline": "^2.46.1",
+    "allure-playwright": "^3.14.0",
+    "newman": "^6.2.3",
     "newman-reporter-htmlextra": "^1.23.1"
   }
 }
